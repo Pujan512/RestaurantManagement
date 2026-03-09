@@ -1,0 +1,82 @@
+﻿@using RestaurantManagement.Core.ViewModels.Bill
+@model BillVM
+
+@{
+	ViewData["Title"] = "Details";
+	Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" style="height:100vh">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - RestaurantManagement</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body style=" width: 600px; margin: 0 auto; background: #3f3f3f"> 
+
+@* <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" class="text-decoration-none">Homepage</a></li>
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Bill" class="text-decoration-none">Bills</a></li>
+		<li class="breadcrumb-item active" aria-current="page">Bill #@Model.Id</li>
+	</ol>
+</nav> *@
+
+<div class="p-5 d-flex flex-column gap-2 mx-auto my-2" style="background: #FFFFFFEE">
+	<h2 class="text-center">Restaurant Management</h2>
+	<h4 class="text-center">Bill</h4>
+		<span>Bill No.: #@Model.Id</span>
+	<div class="d-flex justify-content-between">
+		<span>Tablespace No.: #@Model.Tablespace.TableNumber</span>
+		<span>@Model.Timestamp</span>
+	</div>
+
+	<div class="d-grid fw-bold" style="grid-template-columns:repeat(6, 1fr); border-top: 2px dashed black; border-bottom: 2px dashed black">
+		<span style="grid-column: span 2">Item</span>
+		<span>Quantity</span>
+		<span>Unit</span>
+		<span>Discount(%)</span>
+		<span class="text-end">Total Amt.</span>
+	</div>
+
+	<div class="d-grid" style="grid-template-columns:repeat(6, 1fr)">
+		@foreach (var order in Model.OrderVMs)
+		{
+			@foreach (var orderItem in order.OrderItemVMs)
+			{
+				<div style="grid-column: span 2">@orderItem.MenuItemVM.Name</div>
+				<div>@orderItem.Quantity</div>
+				<div>@orderItem.MenuItemVM.Price</div>
+				<div>@orderItem.MenuItemVM.Discount</div>
+				<div class="text-end">@(((orderItem.MenuItemVM.Price - (orderItem.MenuItemVM.Discount * orderItem.MenuItemVM.Price / 100)) * orderItem.Quantity).ToString("F2"))</div>
+			}
+		}
+	</div>
+	<div class="d-flex justify-content-between" style="border-top: 2px dashed black">
+		<span>Grand Total</span>
+		<span>@Model.SubTotal</span>
+	</div>
+
+	<div class="d-flex justify-content-between">
+		<span>VAT (@Model.VATPercent%)</span>
+		<span>@Model.VAT</span>
+	</div>
+
+	<div class="d-flex justify-content-between">
+		<span>Service Charge (@Model.ServiceChargePercent%)</span>
+		<span>@Model.ServiceCharge</span>
+	</div>
+
+	<div class="d-flex justify-content-between" style="border-top: 2px dashed black; border-bottom: 2px dashed black">
+		<span>Net Total</span>
+		<span>@Model.TotalAmount</span>
+	</div>
+
+	<p class="text-end">Payment method: @Model.PaymentType</p>
+</div>
+
+</body>
+</html> 

@@ -1,0 +1,195 @@
+﻿@using RestaurantManagement.Core.ViewModels.Order
+@model IEnumerable<OrderVM>
+
+@{
+	ViewData["Title"] = "Orders";
+	var pendingOrders = Model.Select(o => o.Status == "Pending");
+	var cancelledOrders = Model.Select(o => o.Status == "Cancelled");
+	var preparingOrders = Model.Select(o => o.Status == "Preparing");
+	var readyOrders = Model.Select(o => o.Status == "Ready");
+}
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" class="text-decoration-none">Homepage</a></li>
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Order" class="text-decoration-none">Orders</a></li>
+	</ol>
+</nav>
+<div>
+	<h2>Orders</h2>
+	<div class="d-flex justify-content-between align-items-start">
+		<ul class="d-flex gap-5" style="font-size: 1.2rem; cursor: pointer">
+			<li class="filter-link" data-filter="all">All Orders</li>
+			<li class="filter-link" style="color: #CC4C11ff" data-filter="cancelled">Cancelled</li>
+			<li class="filter-link" style="color: #8031A7" data-filter="pending">Pending</li>
+			<li class="filter-link" style="color: #856404" data-filter="preparing">Preparing</li>
+			<li class="filter-link" style="color: #10584Fff" data-filter="ready">Ready</li>
+		</ul>
+	</div>
+	<hr />
+</div>
+
+<div class="container">
+	<div class="row">
+		@foreach (var item in Model)
+		{
+			@if ((User.IsInRole("Waiter") && item.Status != "Paid") || (User.IsInRole("Cook") && item.Status != "Ready" && item.Status != "Paid"))
+			{
+				<div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 order-card" data-status="@(item.Status.ToLower())">
+					<div class="position-relative h-100 card rounded-4 "
+						 style="background:@(item.Status == "Cancelled" ? "#FDE0DDFF" : item.Status == "Ready" ? "#C1EAE4ff" : item.Status == "Preparing" ? "#FFF3CD" : "#C9A8DB99"); color: @(item.Status == "Cancelled" ? "#CC4C11ff" : item.Status == "Ready" ? "#10584Fff" : item.Status == "Preparing" ? "#856404" : "#282828")">
+						<div class="card-header">
+							<h5 class="card-title fw-bold mb-0">
+								Order #@item.Id
+							</h5>
+							<div>
+								@if (item.Priority == "Urgent")
+								{
+									<span class="badge text-bg-danger" style="font-size:10px">Urgent</span>
+								}
+								@if (item.IsModified)
+								{
+									<span class="badge text-bg-danger" style="font-size:10px">Modified</span>
+								}
+							</div>
+							<span> @item.OrderTime</span>
+						</div>
+						<div class="card-body d-flex flex-column justify-content-between">
+							<div>
+								<span>Tablespace Number: #@item.Tablespace.TableNumber</span>
+								<span>Status: <strong>@item.Status</strong></span><br />
+								@if (item.OrderItemVMs.Any())
+								{
+									<ul>
+										@foreach (var orderItem in item.OrderItemVMs)
+										{
+											<li>@orderItem.MenuItemVM!.Name <strong>x @orderItem.Quantity</strong></li>
+										}
+									</ul>
+								}
+								else
+								{
+									<p>No items in this order</p>
+								}
+							</div>
+							@if (User.IsInRole("Cook"))
+							{
+								<form asp-action="Edit" asp-controller="Order">
+									<input type="hidden" id="Id" name="Id" value="@item.Id" />
+									<input type="hidden" id="TablespaceId" name="TablespaceId" value="@item.TablespaceId" />
+									@if (item.Status == "Pending")
+									{
+										<input type="hidden" id="Status" name="Status" value="Preparing" />
+										<input class="btn btn-primary position-relative" type="submit" value="Prepare" style="z-index: 10" />
+									}
+									@if (item.Status == "Preparing")
+									{
+										<input type="hidden" id="Status" name="Status" value="Ready" />
+										<input class="btn btn-success position-relative" type="submit" value="Ready" style="z-index: 10" />
+									}
+								</form>
+							}
+						</div>
+
+
+						<div class="btn-group position-absolute top-0 end-0 me-2 d-flex align-items-center" style="z-index:9">
+
+							@if (item.OrderItemVMs.Any()
+												&& (User.IsInRole("Waiter") && item.Status == "Pending")
+												)
+							{
+								<div class="edit" style="cursor: pointer">
+									<i class="bi bi-pencil-square text-black fs-5 me-1"></i>
+								</div>
+							}
+							@if ((User.IsInRole("Cook") && item.Status == "Cancelled") || (User.IsInRole("Waiter") && item.Status == "Pending"))
+							{
+								<a asp-action="Delete" asp-route-id="@item.Id" asp-controller="Order">
+									<i class="bi bi-trash text-danger fs-4"></i>
+								</a>
+							}
+						</div>
+
+						@if (User.Identity!.IsAuthenticated && (User.IsInRole("Cook") || (User.IsInRole("Waiter") && item.Status == "Pending")))
+						{
+							<a asp-action="Details" asp-route-id="@item.Id" asp-controller="Order" class="position-absolute w-100 h-100 opacity-0">
+							</a>
+						}
+
+						<div class="editForm d-none pt-0">
+							<form asp-action="Edit" asp-controller="Order">
+								<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+								<input type="hidden" id="Id" name="Id" value="@item.Id" />
+								<input type="hidden" id="TablespaceId" name="TablespaceId" value="@item.TablespaceId" />
+								<div class="form-group">
+									<label name="Status" id="Status" class="control-label"></label>
+									@if (User.Identity!.IsAuthenticated && User.IsInRole("Waiter"))
+									{
+										<select id="Priority" name="Priority" class="form-select">
+											<option value="">Select Priority</option>
+											<option value="Urgent">Urgent</option>
+											<option value="Medium">Medium</option>
+										</select>
+										<select id="Status" name="Status" class="form-select mt-1">
+											<option value="">Select Status</option>
+											<option value="Pending">Pending</option>
+											<option value="Cancelled">Cancelled</option>
+										</select>
+									}
+								</div>
+								<div class="cancel position-absolute top-0 end-0 me-2" style="cursor: pointer">
+									<i class="bi bi-x-circle text-danger fs-4"></i>
+								</div>
+							</form>
+						</div>
+
+					</div>
+				</div>
+			}
+
+		}
+	</div>
+
+@if (!Model.Any())
+{
+	<div class="alert alert-danger mt-4" role="alert">
+		<i class="bi bi-info-circle-fill me-2"></i> No orders found.
+	</div>
+}
+
+@section Scripts {
+		<script>
+			$(document).ready(function() {
+
+				function filterOrders(status) {
+				if (status === 'all') {
+					$('.order-card').show();
+				} else {
+					$('.order-card').hide();
+					$(`.order-card[data-status="${status}"]`).show();
+				}
+
+				$('.filter-link').removeClass('active');
+				$(`.filter-link[data-filter="${status}"]`).addClass('active');
+			}
+
+			$('.filter-link').click(function() {
+				filterOrders($(this).data('filter'));
+			});
+			filterOrders('all');
+
+				$(".edit").click(function(){
+					$(this).parent().siblings().not(".card-header").not(".editForm").addClass("d-none");
+					$(this).parent().addClass("d-none");
+					$(this).parent().siblings(".editForm").removeClass("d-none").addClass("card-body");
+				})
+
+				$(".form-select").change(function() {
+					$(this).closest("form").submit();
+				});
+
+				$(".cancel").click(function(){
+				location.reload();
+			})
+			});
+		</script>
+}

@@ -1,0 +1,57 @@
+﻿@model RestaurantManagement.Core.ViewModels.Account.LoginVM
+
+@{
+	Layout = "~/Views/Shared/_AuthLayout.cshtml";
+	ViewBag.Title = "User Login";
+}
+
+<div class="d-flex py-4 flex-column align-items-center">
+	<div class="p-5 shadow-lg d-flex align-items-center flex-column gap-2" style=" border-radius:10px">
+		<h2 class="mt-0">Login</h2>
+		<div>
+			<form method="post">
+				<div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+				<div class="mb-3">
+					<div class="input-group">
+						<span class="input-group-text" style="border-radius: 5px 0 0 5px;">
+							<i class="bi bi-envelope-fill"></i>
+						</span>
+						<input asp-for="Email" class="form-control" required placeholder="Email Address"
+							   style="border-radius: 0 5px 5px 0; width: 250px" />
+					</div>
+					<span asp-validation-for="Email" class="text-danger small"></span>
+				</div>
+				<div class="mb-1">
+					<div class="input-group">
+						<span class="input-group-text" style="border-radius: 5px 0 0 5px;">
+							<i class="bi bi-lock-fill"></i>
+						</span>
+						<input asp-for="Password" type="password" class="form-control" required placeholder="Password" style="border-radius:0 5px 5px 0;" />
+					</div>
+					<span asp-validation-for="Password" class="text-danger small"></span>
+
+				</div>
+
+				<a href="#" class="text-decoration-none text-end d-flex justify-content-end mt-0 mb-1" style="font-size:14px">Forgot password?</a>
+
+				<div class="d-grid mb-3">
+					<button type="submit" class="btn btn-primary" style="border-radius:5px;">
+						Login
+					</button>
+				</div>
+
+			</form>
+		</div>
+	</div>
+	<div class="text-center">
+		<p class="mb-2">
+			Don't have an account?
+			<a asp-action="Register" class="text-primary text-decoration-none">Sign Up</a>
+		</p>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

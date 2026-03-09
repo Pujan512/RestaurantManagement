@@ -1,0 +1,172 @@
+﻿@using RestaurantManagement.Core.ViewModels.Tablespace
+@model IEnumerable<TablespaceVM>
+
+@{
+	ViewData["Title"] = "Tables";
+	var availableTables = Model.Select(b => !b.IsOccupied);
+	var occupiedTables = Model.Select(b => b.IsOccupied);
+}
+
+<style>
+	input[type="number"]::-webkit-outer-spin-button,
+	input[type="number"]::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	input[type="number"] {
+		-moz-appearance: textfield;
+	}
+</style>
+<div>
+	<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" class="text-decoration-none">Homepage</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Tables</li>
+		</ol>
+	</nav>
+	<h3 class="fs-3">Manage Tables</h3>
+	<div style="display: flex; justify-content: space-between; align-items: center">
+		<ul class="d-flex gap-5" style="font-size: 1.2rem; cursor:pointer">
+			<li class="filter-link active" data-filter="all">All Tables</li>
+			<li class="filter-link" data-filter="available" style=" color: #10584Fff">Available</li>
+			<li class="filter-link" data-filter="occupied" style="color: #CC4C11ff">Occupied</li>
+		</ul>
+		@if (User.Identity!.IsAuthenticated && User.IsInRole("Admin"))
+		{
+			<form asp-action="Create" asp-controller="Tablespace">
+				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+				<div class="form-group d-flex align-items-center gap-2">
+					<label id="Capacity" name="Capacity" class="control-label"></label>
+					<input id="Capacity" name="Capacity" placeholder="Capacity" type="number" class="form-control" />
+					<span class="text-danger"></span>
+
+					<input type="submit" value="Add Table" class="btn btn-primary" />
+				</div>
+			</form>
+		}
+	</div>
+	<hr />
+</div>
+
+<div class="container">
+	<div class="row">
+		@foreach (var item in Model)
+		{
+			<div class="col-sm-12 col-md-6 col-lg-3 mb-4 table-card"
+				 data-status="@(item.IsOccupied ? "occupied" : "available")">
+				<div class="position-relative card h-100 rounded-4 pt-3"
+					 style="aspect-ratio: 6/5; background:@(item.IsOccupied ? "#FDE0DDFF" : "#C1EAE4ff"); color: @(item.IsOccupied ? "#CC4C11ff" : "#10584Fff")">
+					<div class="card-body d-flex flex-column justify-content-center align-items-center">
+						<h4 class="card-title fw-bold">Table #@item.TableNumber</h4>
+						<p class="d-flex align-items-center gap-2"><i class="bi bi-people-fill fs-4"></i> @item.Capacity</p>
+						@if (User.IsInRole("Waiter"))
+						{
+
+							<form class="d-flex justify-content-center w-100" asp-action="Edit" asp-controller="Tablespace" asp-route-id="@item.Id">
+								<input type="hidden" id="Id" name="Id" value="@item.Id" />
+								<input type="hidden" id="Capacity" name="Capacity" value="@item.Capacity" />
+
+								@if (item.IsOccupied)
+								{
+									<select id="IsOccupied" name="IsOccupied" class="d-none">
+										<option selected value="@false"></option>
+									</select>
+									<input type="submit" class="btn btn-success" value="Vacate" style="z-index: 10;" />
+								}
+								else
+								{
+									<select id="IsOccupied" name="IsOccupied" class="d-none">
+										<option selected value="@true"></option>
+									</select>
+									<input type="submit" class="btn btn-secondary" value="Occupy" style="z-index: 10;" />
+								}
+							</form>
+						}
+					</div>
+
+					<div class="btn-group position-absolute top-0 end-0 me-2 d-flex align-items-center" style="z-index:9">
+						@if (User.Identity!.IsAuthenticated && (User.IsInRole("Waiter") || User.IsInRole("Admin")))
+						{
+							<div class="edit" style="cursor: pointer">
+								<i class="bi bi-pencil-square text-black fs-4 me-1"></i>
+							</div>
+						}
+						@if (User.Identity!.IsAuthenticated && User.IsInRole("Admin"))
+						{
+							<a asp-action="Delete" asp-route-id="@item.Id">
+								<i class="bi bi-trash text-danger fs-3"></i>
+							</a>
+						}
+					</div>
+					@if (User.Identity!.IsAuthenticated && (User.IsInRole("Waiter") || User.IsInRole("Cashier")))
+					{
+						<a asp-action="Details" asp-route-id="@item.Id" class="position-absolute w-100 h-100 opacity-0">
+							<i class="bi bi-info-circle"></i>
+						</a>
+					}
+					<div class="editForm d-none p-3 pt-0">
+						<form asp-action="Edit" asp-controller="Tablespace" asp-route-id="@item.Id">
+							<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+							<input type="hidden" id="Id" name="Id" value="@item.Id" />
+							<div class="form-group">
+								<label for="Capacity" class="control-label">Capacity</label>
+								<input type="number" id="Capacity" name="Capacity" class="form-control" required value="@item.Capacity" />
+							</div>
+							<div class="cancel position-absolute top-0 end-0 me-2" style="cursor: pointer">
+								<i class="bi bi-x-circle text-danger fs-4"></i>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+@if (!Model.Any())
+{
+	<div class="alert alert-info mt-4" role="alert">
+		<i class="bi bi-info-circle-fill me-2"></i> No tables found. Create a new table to get started.
+	</div>
+}
+
+
+@section Scripts {
+	<script>
+		$(document).ready(function() {
+
+			function filterTables(status) {
+				if (status === 'all') {
+					$('.table-card').show();
+				} else {
+					$('.table-card').hide();
+					$(`.table-card[data-status="${status}"]`).show();
+				}
+
+				$('.filter-link').removeClass('active');
+				$(`.filter-link[data-filter="${status}"]`).addClass('active');
+			}
+
+			$('.filter-link').click(function() {
+				filterTables($(this).data('filter'));
+			});
+			filterTables('all');
+
+			$(".edit").click(function(){
+				$(this).parent().siblings().not(".editForm").addClass("d-none");
+				$(this).parent().addClass("d-none");
+				$(this).parent().siblings(".editForm").removeClass("d-none").addClass("card-body");
+			})
+
+
+			$('input[type="number"]').change(function() {
+					$(this).closest("form").submit();
+			});
+
+			$(".cancel").click(function(){
+			location.reload();
+		})
+		});
+	</script>
+}

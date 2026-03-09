@@ -1,0 +1,84 @@
+﻿@using RestaurantManagement.Core.ViewModels.Category
+@model IEnumerable<CategoryVM>
+
+@{
+	ViewData["Title"] = "Categories";
+}
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" class="text-decoration-none">Home</a></li>
+		<li class="breadcrumb-item">Categories</li>
+	</ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+	<h1>Categories</h1>
+
+	<form asp-action="Create" asp-controller="Category">
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+		<div class="form-group d-flex align-items-center gap-2">
+			<label id="Title" name="Title" class="control-label"></label>
+			<input id="Title" name="Title" placeholder="Category Title" class="form-control" />
+			<span id="Title" name="Title" class="text-danger"></span>
+
+			<input type="submit" value="Add Category" class="btn btn-primary" />
+		</div>
+	</form>
+</div>
+
+<div class="container">
+	<div class="row row-cols-1 row-cols-md-3 g-3">
+		@foreach (var item in Model)
+		{
+			<div class="col">
+				<div class="border-black border p-4 rounded-3 h-100 fw-bold position-relative d-flex justify-content-between align-items-center">
+					<span class=" fs-4">@item.Title</span>
+					<div class="btn-group me-2 d-flex align-items-center" style="z-index:9">
+
+						<div class="edit" style="cursor: pointer">
+							<i class="bi bi-pencil-square text-secondary fs-4 me-1"></i>
+						</div>
+
+						<a asp-action="Delete" asp-route-id="@item.Id" asp-controller="Category">
+							<i class="bi bi-trash text-danger fs-4"></i>
+						</a>
+					</div>
+					<a asp-action="Details" asp-route-id="@item.Id" asp-controller="Category" class="position-absolute w-100 h-100 opacity-0">
+						<i class="bi bi-info-circle"></i>
+					</a>
+					<form asp-action="Edit" asp-controller="Category" asp-route-id="@item.Id" class="editForm d-none gap-2 align-items-center">
+						<input type="hidden" id="Id" name="Id" value="@item.Id" />
+						<div class="form-group">
+							<input id="Title" name="Title" class="form-control" required value="@item.Title"/>
+						</div>
+						<div class="form-group">
+							<button style="background: none;border: none">
+								<i class="bi bi-check-circle text-success fs-4"></i>
+							</button>
+							<i class="bi bi-x-circle text-danger fs-4" onclick="location.reload()" style="cursor: pointer"></i>
+						</div>
+					</form>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+
+@if (!Model.Any())
+{
+	<div class="alert alert-info mt-4" role="alert">
+		<i class="bi bi-info-circle-fill me-2"></i> No categories found.
+	</div>
+}
+@section Scripts {
+	<script>
+		$(document).ready(function() {
+			$(".edit").click(function(){
+				$(this).parent().siblings().not(".editForm").addClass("d-none");
+				$(this).parent().siblings(".editForm").removeClass("d-none").addClass("d-flex");
+				$(this).parent().addClass("d-none");
+			})
+		});
+	</script>
+}

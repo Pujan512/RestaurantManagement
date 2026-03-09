@@ -1,0 +1,65 @@
+﻿@using RestaurantManagement.Core.ViewModels.Bill
+@model IEnumerable<BillVM>
+
+@{
+	ViewData["Title"] = "Bill-Index";
+	var groupedBillsByDay = Model.GroupBy(b => b.Timestamp.Date);
+}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" class="text-decoration-none">Homepage</a></li>
+		<li class="breadcrumb-item active" aria-current="page">Bills</li>
+	</ol>
+</nav>
+
+<div class="px-5">
+	@foreach (var bill in groupedBillsByDay)
+	{
+		<h3>@bill.Key.ToShortDateString()</h3>
+		<table class="table table-hover">
+			<thead class="table-info">
+				<tr>
+					<th>Bill No.</th>
+					<th>Tablespace No.</th>
+					<th>Timestamp</th>
+					<th>Payment Type</th>
+					<th>Total Amt.</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in bill.OrderByDescending(b => b.Timestamp))
+				{
+					<tr class="bill position-relative" data-table-id="@item.Id">
+						<td>Bill #@item.Id</td>
+						<td>Table #@item.TablespaceId</td>
+						<td>@item.Timestamp</td>
+						<td>@item.PaymentType</td>
+						<td>@item.TotalAmount</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	}
+</div>
+
+@if (!Model.Any())
+{
+	<div class="alert alert-danger mt-4" role="alert">
+		<i class="bi bi-info-circle-fill me-2"></i> No Bills found.
+	</div>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function() {
+            $(".bill").click(function(){
+				var tableId = $(this).data("table-id");
+				window.open('/Bill/Details/' + tableId, '_blank');
+			})
+        });
+    </script>
+}

@@ -1,0 +1,152 @@
+﻿@using RestaurantManagement.Core.ViewModels.OrderItem
+@model AddOrderItemVM
+
+@{
+	ViewData["Title"] = "Create";
+}
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Order" class="text-decoration-none">Orders</a></li>
+		<li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@ViewBag.OrderId" asp-controller="Order" class="text-decoration-none">Order #@ViewBag.OrderId</a></li>
+		<li class="breadcrumb-item">Add OrderItem</li>
+	</ol>
+</nav>
+
+<h4>OrderItem</h4>
+<div class="d-flex gap-3">
+	<label for="category">Category</label>
+	<select id="category" style="width:100px">
+		<option value="all">All</option>
+		@foreach (var item in ViewBag.Categories)
+		{
+			<option value="@item.Id">@item.Title</option>
+		}
+	</select>
+</div>
+<hr />
+<form asp-action="Create" id="orderItemForm" class="position-relative">
+	<input type="hidden" name="MenuItemId" id="menuItemId" />
+	<input type="hidden" name="Quantity" id="quantity" />
+	<input type="hidden" name="OrderId" value="@ViewBag.OrderId" />
+	<div class="form-group position-absolute" style="top: -60px; right:0px; opacity:1">
+		<input type="submit" value="Add Item" class="btn btn-primary" id="submitBtn" disabled />
+	</div>
+
+	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+	<div class="d-flex gap-5 flex-wrap">
+		@foreach (var menuItem in ViewBag.MenuItems)
+		{
+			<div id="@menuItem.Id" class="rounded-3 p-4 pb-0 d-flex flex-column shadow-lg position-relative menuItem" data-category="@menuItem.CategoryId">
+				<img src="@menuItem.ImageUrl" width="175" height="150" />
+				<div class="counter d-none justify-content-center align-items-center" style="width: 175px; height:150px;">
+					<div class="fs-1 px-3 rounded-5 text-white d-flex gap-4" style="background: #FFFFFF">
+						<button type="button" class="dec bg-transparent" style="border: none; color:#4B4B4B">-</button>
+						<span class="quantity" style="color:#4B4B4B">0</span>
+						<button type="button" class="inc bg-transparent" style="border: none; color:#4B4B4B">+</button>
+					</div>
+				</div>
+				<h4 class="fw-bold">@menuItem.Name</h4>
+				<span>Rs.@menuItem.Price</span>
+				<p>@menuItem.Description</p>
+			</div>
+		}
+	</div>
+
+</form>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script>
+		$(document).ready(function() {
+			let selectedItem = null;
+			let quantity = 0;
+
+				$("#category").change(function() {
+			const selectedCategory = $(this).val();
+
+			$(".menuItem").each(function() {
+				const itemCategory = $(this).data("category");
+
+				if (selectedCategory === "all" || itemCategory == selectedCategory) {
+					$(this).removeClass("d-none");
+				} else {
+					$(this).addClass("d-none");
+					if ($(this).attr("id") === selectedItem) {
+						resetSelection();
+					}
+				}
+			});
+					console.log("Selected category:", selectedCategory);
+		});
+
+			function resetSelection() {
+			if (selectedItem) {
+				$(`#${selectedItem}`).css({"background": "white","color": "inherit"});
+				$(`#${selectedItem} img`).show();
+				$(`#${selectedItem} .counter`).addClass("d-none").removeClass("d-flex");
+				$(`#${selectedItem} .quantity`).text('0');
+			}
+			selectedItem = null;
+			quantity = 0;
+			$("#menuItemId").val("");
+			$("#quantity").val("");
+			$("#submitBtn").prop('disabled', true);
+		}
+
+			$(".menuItem").click(function() {
+				const itemId = $(this).attr('id');
+
+				if (selectedItem === itemId) return;
+
+				if (selectedItem) {
+					$(`#${selectedItem}`).css({"background": "white", "color": "inherit"});
+					$(`#${selectedItem} img`).show();
+					$(`#${selectedItem} .counter`).addClass("d-none").removeClass("d-flex");
+					$(`#${selectedItem} .quantity`).text('0');
+				}
+
+				selectedItem = itemId;
+				quantity = 1;
+
+				$(this).css({"background": "#4A4A4ADD", "color": "white"});
+				$(this).children("img").hide();
+				$(this).children(".counter").removeClass("d-none").addClass("d-flex");
+				$(this).find(".quantity").text(quantity);
+
+
+				$("#menuItemId").val(itemId);
+				$("#quantity").val(quantity);
+
+
+				$("#submitBtn").prop('disabled', false);
+			});
+
+			$(document).on('click', '.inc', function(e) {
+				e.stopPropagation();
+				quantity += 1;
+				$(this).closest('.menuItem').find(".quantity").text(quantity);
+				$("#quantity").val(quantity);
+			});
+
+			$(document).on('click', '.dec', function(e) {
+				e.stopPropagation();
+				if (quantity > 1) {
+					quantity -= 1;
+					$(this).closest('.menuItem').find(".quantity").text(quantity);
+					$("#quantity").val(quantity);
+				}
+			});
+
+			$("#orderItemForm").submit(function(e) {
+				if (!selectedItem) {
+					e.preventDefault();
+					alert("Please select an item first.");
+					return false;
+				}
+				return true;
+			});
+		});
+	</script>
+}

@@ -1,0 +1,52 @@
+﻿@using RestaurantManagement.Core.ViewModels.Category
+@model CategoryVM
+
+@{
+	ViewData["Title"] = "Details";
+}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" class="text-decoration-none">Home</a></li>
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Category" class="text-decoration-none">Categories</a></li>
+		<li class="breadcrumb-item">@Model.Title</li>
+	</ol>
+</nav>
+
+<div style="display: flex; justify-content: space-between">
+	<h3>@Html.DisplayFor(model => model.Title)</h3>
+	<a asp-route-id="@Model.Id" asp-action="Create" asp-controller="MenuItem" class="btn btn-primary">
+		Add Item
+	</a>
+</div>
+<hr />
+
+@if (Model.MenuItemVMs != null && Model.MenuItemVMs.Any())
+{
+	<div class="d-flex gap-5 flex-wrap	">
+		@foreach (var item in Model.MenuItemVMs)
+		{
+			<div class="rounded-3 p-2 d-flex flex-column shadow position-relative ">
+				<img src="@item.ImageUrl" width="175" height="150" />
+					<h5 class="fw-bold m-0">@item.Name</h5>
+					<span class="m-0">Rs. @((item.Price - (item.Price * item.Discount / 100)).ToString("F2"))</span>
+				<p class="text-secondary" style="font-size: 14px">@item.Description</p>
+				<div class="btn-group position-absolute top-0 end-0 me-2 d-flex align-items-center" style="z-index:9">
+					<a asp-action="Edit" asp-route-id="@item.Id" asp-controller="MenuItem">
+						<i class="bi bi-pencil-square text-black fs-4 me-1"></i>
+					</a>
+					<a asp-action="Delete" asp-route-id="@item.Id" asp-controller="MenuItem">
+						<i class="bi bi-trash text-danger fs-3"></i>
+					</a>
+				</div>
+			</div>
+		}
+	</div>
+}
+else
+{
+	<div class="alert alert-info mt-4" role="alert">
+		<i class="bi bi-info-circle-fill me-2"></i> No menu items found for this category.
+	</div>
+}
+

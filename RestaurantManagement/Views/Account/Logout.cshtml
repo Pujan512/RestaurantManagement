@@ -1,0 +1,16 @@
+﻿@{
+	ViewData["Title"] = "Delete";
+	Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="d-flex justify-content-center align-items-center flex-column h-100">
+	<div class="container w-auto shadow rounded p-5" style="background: #292C2D">
+		<h3>Are you sure you want to logout?</h3>
+		<form asp-action="LogoutConfirmed" asp-controller="account" class="d-flex justify-content-center gap-3">
+			<button id="logout" class="btn btn-danger">Logout</button>
+			
+			<a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Cancel</a>
+		</form>
+	</div>
+</div>
+</div>

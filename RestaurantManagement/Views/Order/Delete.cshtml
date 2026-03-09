@@ -1,0 +1,48 @@
+﻿@using RestaurantManagement.Core.ViewModels.Order
+@model OrderVM
+
+@{
+	ViewData["Title"] = "Delete";
+}
+
+<div class="d-flex justify-content-center align-items-center flex-column h-100">
+	<div class="container shadow rounded p-5 w-auto	" style="background: #FFFFFF55">
+		<h3>Are you sure you want to delete this?</h3>
+		<div>
+			<h4>Order</h4>
+			<hr />
+			<dl class="row">
+				<dt class="col-sm-2">
+					Order
+				</dt>
+				<dd class="col-sm-10">
+					Order #@Html.DisplayFor(model => model.Id)
+				</dd>
+				<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.OrderTime)
+				</dt>
+				<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.OrderTime)
+				</dd>
+				<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.IsModified)
+				</dt>
+				<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.IsModified)
+				</dd>
+				<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.Status)
+				</dt>
+				<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.Status)
+				</dd>
+			</dl>
+
+			<form asp-action="Delete">
+				<input type="hidden" asp-for="Id" />
+				<input type="submit" value="Delete" class="btn btn-danger" />
+				<a asp-action="Index" class="btn btn-secondary">Cancel</a>
+			</form>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,76 @@
+﻿@using RestaurantManagement.Core.ViewModels.MenuItem
+@model AddItemVM
+
+@{
+	ViewData["Title"] = "Create";
+}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" class="text-decoration-none">Home</a></li>
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Category" class="text-decoration-none">Categories</a></li>
+		<li class="breadcrumb-item"><a asp-action="Details" asp-controller="Category" asp-route-id="@ViewBag.CategoryId" class="text-decoration-none">@ViewBag.CategoryTitle</a></li>
+		<li class="breadcrumb-item">Add Menu Item</li>
+	</ol>
+</nav>
+
+<div class="container py-4">
+	<div class="row justify-content-center">
+		<div class="p-5 shadow-lg" style=" width: 70%; border-radius:10px">
+			<div class="d-flex align-items-center flex-column">
+				<h4>Create MenuItem</h4>
+				<form asp-action="Create" enctype="multipart/form-data" class="w-100">
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label asp-for="Name" class="control-label"></label>
+							<input asp-for="Name" class="form-control" />
+							<span asp-validation-for="Name" class="text-danger"></span>
+						</div>
+
+						<div class="form-group col-md-6">
+							<label asp-for="IsAvailable" class="control-label">Availability</label>
+							<select asp-for="IsAvailable" class="form-select" required>
+								<option value=@true>Yes</option>
+								<option value=@false>No</option>
+							</select>
+							<span asp-validation-for="IsAvailable" class="text-danger"></span>
+						</div>
+
+					</div>
+					<div class="form-group col-md-12">
+						<label asp-for="ImageUrl" class="control-label"></label>
+						<input type="file" name="ImageUrl" class="form-control" />
+						<span asp-validation-for="ImageUrl" class="text-danger"></span>
+					</div>
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label asp-for="Price" class="control-label"></label>
+							<input type="number" asp-for="Price" class="form-control" />
+							<span asp-validation-for="Price" class="text-danger"></span>
+						</div>
+						<div class="form-group col-md-6">
+							<label asp-for="Discount" class="control-label"></label>
+							<input type="number" asp-for="Discount" class="form-control" />
+							<span asp-validation-for="Discount" class="text-danger"></span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label asp-for="Description" class="control-label"></label>
+						<textarea asp-for="Description" class="form-control" rows="5" cols="50"></textarea>
+						<span asp-validation-for="Description" class="text-danger"></span>
+					</div>
+
+					<div class="form-group mt-2 row">
+						<input type="submit" value="Create" class="btn btn-primary ms-3" style="width:95%"/>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

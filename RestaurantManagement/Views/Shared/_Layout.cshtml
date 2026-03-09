@@ -1,0 +1,155 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using RestaurantManagement.Core.Models
+@inject SignInManager<User> SignInManager
+
+@{
+	var activeController = ViewContext.RouteData.Values["controller"];
+
+}
+
+<!DOCTYPE html>
+<html lang="en" style="height:100vh; scrollbar-width: none; -ms-overflow-style: none;">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - RestaurantManagement</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/RestaurantManagement.styles.css" asp-append-version="true" />
+	<style>
+		.nav-item:hover {
+			background: #FDE0DD88;
+			border-radius: 10px;
+		}
+	</style>
+</head>
+<body class="d-flex flex-column h-100" style="max-height: 100vh;">
+	<div class="d-flex flex-grow-1 gap-2">
+		<header class="d-flex">
+			<nav class="py-4 shadow h-100" style="background:#3D4142;">
+				<div class="container-fluid h-100">
+					<a class="navbar-brand" style="height: 15%; color:#FAC1D9" asp-area="" asp-controller="Home" asp-action="Index">
+						@* <img src="~/Images/logo.png" width="75" alt="logo" /> *@
+						@* <span class="text-black" style="font-weight: 500">Restaurant<br /> Management<br /> System</span> *@
+						<h5 class="text-center">RMS</h5>
+					</a>
+					<div class="navbar-collapse collapse d-flex flex-column justify-content-between w-100 h-100" style="font-size: 12px">
+						<ul class="navbar-nav flex-grow-1 w-100">
+							<li class="nav-item px-3 rounded @(activeController.ToString() == "Home" ? "bg-primary" : "")">
+								<a class="nav-link text-white d-flex flex-column align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+									<i class="bi bi-house-fill fs-5"></i>
+									<span>Home</span>
+								</a>
+							</li>
+							@if (User.Identity!.IsAuthenticated && User.IsInRole("Admin"))
+							{
+								<li class="nav-item px-3 rounded @(activeController.ToString() == "Category" ? "bg-primary" : "")">
+									<a class="nav-link text-white d-flex flex-column align-items-center" asp-area="" asp-controller="Category" asp-action="Index">
+										<i class="bi bi-collection-fill fs-5"></i>
+										<span>Category</span>
+									</a>
+								</li>
+								<li class="nav-item px-3 rounded @(activeController.ToString() == "Account" ? "bg-primary" : "")">
+									<a class="nav-link text-white d-flex flex-column align-items-center" asp-area="" asp-controller="Account" asp-action="Index">
+										<i class="bi bi-people-fill fs-5"></i>
+										<span>Users</span>
+									</a>
+								</li>
+							}
+							@if (User.Identity!.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Waiter") || User.IsInRole("Cashier")))
+							{
+								<li class="nav-item px-3 rounded @(activeController.ToString() == "Tablespace" ? "bg-primary" : "")">
+									<a class="nav-link text-white d-flex flex-column align-items-center" asp-area="" asp-controller="Tablespace" asp-action="Index">
+										<img src="~/Images/table.png" width="25" style="filter: brightness(0) invert(1);" />
+										<span>Tables</span>
+									</a>
+								</li>
+							}
+							@if (User.Identity!.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Cashier")))
+							{
+								<li class="nav-item px-3 rounded @(activeController.ToString() == "Bill" ? "bg-primary" : "")">
+									<a class="nav-link text-white d-flex flex-column align-items-center" asp-area="" asp-controller="Bill" asp-action="Index">
+										<i class="bi bi-receipt fs-5"></i>
+										<span>Bills</span>
+									</a>
+								</li>
+							}
+							@if (User.Identity!.IsAuthenticated && (User.IsInRole("Cook") || User.IsInRole("Waiter")))
+							{
+								<li class="nav-item px-3 rounded @(activeController.ToString() == "Order" ? "bg-primary" : "")">
+									<a class="nav-link text-white d-flex flex-column align-items-center" asp-area="" asp-controller="Order" asp-action="Index">
+										<img src="~/Images/order.png" width="25" style="filter: brightness(0) invert(1);" />
+										<span>Orders</span>
+									</a>
+								</li>
+							}
+							@if (User.Identity!.IsAuthenticated && User.IsInRole("Admin"))
+							{
+								<li class="nav-item px-3 rounded @(activeController.ToString() == "Schedule" ? "bg-primary" : "")">
+									<a class="nav-link text-white d-flex flex-column align-items-center" asp-area="" asp-controller="Schedule" asp-action="Index">
+										<i class="bi bi-clock fs-5"></i>
+										<span>Schedule</span>
+									</a>
+								</li>
+								<li class="nav-item px-3 rounded @(activeController.ToString() == "SystemSetting" ? "bg-primary" : "")">
+									<a class="nav-link text-white d-flex flex-column align-items-center" asp-area="" asp-controller="SystemSetting" asp-action="Index">
+										<i class="bi bi-gear fs-5"></i>
+										<span>Settings</span>
+									</a>
+								</li>
+							}
+
+						</ul>
+						<ul class="list-unstyled ml-auto w-100">
+							@if (SignInManager.IsSignedIn(User))
+							{
+								<li class="nav-item px-3" style="cursor:pointer">
+									<div class="nav-link d-flex flex-column align-items-center text-white" data-bs-toggle="modal" data-bs-target="#logoutModal">
+										<i class="bi bi-box-arrow-right fs-5"></i>
+										<span>Logout</span>
+									</div>
+								</li>
+
+								<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h1 class="modal-title fs-5" id="exampleModalLabel">Logout Confirmation</h1>
+												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											</div>
+											<div class="modal-body">
+												<h5>Are you sure you want to logout?</h5>
+											</div>
+											<div class="modal-footer">
+												<form asp-action="LogoutConfirmed" asp-controller="account" class="d-flex justify-content-center gap-3">
+													<button id="logout" class="btn btn-danger">Logout</button>
+													<a class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+												</form>
+											</div>
+										</div>
+									</div>
+								</div>
+							}
+						</ul>
+					</div>
+				</div>
+			</nav>
+		</header>
+		<main role="main" class="d-flex flex-column flex-grow-1 pt-4 overflow-auto mb-3" style="max-height: 92vh; scrollbar-width: none; -ms-overflow-style: none; padding: 0 5.5rem">
+			@RenderBody()
+		</main>
+	</div>
+
+	<footer class="border-top footer">
+		<div class="container text-center">
+			&copy; 2025 - RestaurantManagement - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-black">Privacy</a>
+		</div>
+	</footer>
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

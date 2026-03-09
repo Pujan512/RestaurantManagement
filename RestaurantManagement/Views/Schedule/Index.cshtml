@@ -1,0 +1,54 @@
+﻿@model IEnumerable<RestaurantManagement.Core.ViewModels.Schedule.ScheduleVM>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" class="text-decoration-none">Homepage</a></li>
+		<li class="breadcrumb-item active" aria-current="page">Schedule</li>
+	</ol>
+</nav>
+
+<div class="d-flex justify-content-between mb-4">
+	<h3>Schedules</h3>
+	<a asp-action="Create" class="btn btn-primary"> Add Schedule</a>
+</div>
+
+<table class="table table-hover">
+	<thead class="table-info">
+		<tr>
+			<th>Name</th>
+			<th></th>
+			<th>Role</th>
+			<th>Shift Start</th>
+			<th>Shift End</th>
+			<th class="text-center">Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr class="bill position-relative">
+				<td>
+					@Html.DisplayFor(modelItem => item.UserVM.FirstName) @Html.DisplayFor(modelItem => item.UserVM.MiddleName) @Html.DisplayFor(modelItem => item.UserVM.LastName)
+				</td>
+				<td></td>
+				<td>
+					@(item.UserVM.Role == "Admin" ? "Manager" : item.UserVM.Role)
+				</td>
+				<td>@Html.DisplayFor(modelItem => item.ShiftStart)</td>
+				<td >@Html.DisplayFor(modelItem => item.ShiftEnd)</td>
+				<td class="fs-4 d-flex justify-content-center gap-3">
+					<a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
+						<i class="bi bi-pencil-square text-secondary me-1"></i>
+					</a>
+					<a asp-action="Delete" asp-route-id="@item.Id">
+						<i class="bi bi-trash text-danger"></i>
+					</a>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>

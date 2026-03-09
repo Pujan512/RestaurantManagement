@@ -1,0 +1,36 @@
+﻿@model RestaurantManagement.Core.ViewModels.SystemSetting.SystemSettingVM
+
+@{
+	ViewData["Title"] = "Index";
+}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" class="text-decoration-none">Homepage</a></li>
+		<li class="breadcrumb-item">System Settings</li>
+	</ol>
+</nav>
+
+<div class="d-flex justify-content-between">
+	<h3>System Setting</h3>
+	<a asp-action="Edit" class="btn btn-primary">
+	 Edit Setting
+	</a>
+</div>
+<hr />
+<dl class="row">
+	<dt class="col-sm-2">
+		@Html.DisplayNameFor(model => model.VAT) (%)
+	</dt>
+	<dd class="col-sm-10">
+		@Html.DisplayFor(model => model.VAT)
+	</dd>
+	<dt class="col-sm-2">
+		@Html.DisplayNameFor(model => model.ServiceCharge) (%)
+
+	</dt>
+	<dd class="col-sm-10">
+		@Html.DisplayFor(model => model.ServiceCharge)
+	</dd>
+</dl>
+
