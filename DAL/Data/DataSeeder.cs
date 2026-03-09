@@ -40,7 +40,7 @@ namespace RestaurantManagement.DAL.Data
             }
 
             // Seed an admin user
-            var adminEmail = "pujan@gmail.com";
+            var adminEmail = "admin@gmail.com";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null)
             {
